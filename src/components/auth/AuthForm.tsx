@@ -26,11 +26,17 @@ export const AuthForm = () => {
     try {
       const { error } = await signIn(loginData.email, loginData.password);
       if (error) {
-        toast.error('فشل في تسجيل الدخول: ' + error.message);
+        console.error('Login error:', error);
+        if (error.message.includes('Invalid login credentials')) {
+          toast.error('بيانات تسجيل الدخول غير صحيحة. تأكد من البريد الإلكتروني وكلمة المرور.');
+        } else {
+          toast.error('فشل في تسجيل الدخول: ' + error.message);
+        }
       } else {
         toast.success('تم تسجيل الدخول بنجاح');
       }
     } catch (error) {
+      console.error('Unexpected error:', error);
       toast.error('حدث خطأ غير متوقع');
     } finally {
       setLoading(false);
@@ -45,6 +51,11 @@ export const AuthForm = () => {
       return;
     }
 
+    if (registerData.password.length < 6) {
+      toast.error('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -55,11 +66,13 @@ export const AuthForm = () => {
       );
       
       if (error) {
+        console.error('Registration error:', error);
         toast.error('فشل في التسجيل: ' + error.message);
       } else {
         toast.success('تم التسجيل بنجاح، يرجى تفعيل حسابك من خلال البريد الإلكتروني');
       }
     } catch (error) {
+      console.error('Unexpected error:', error);
       toast.error('حدث خطأ غير متوقع');
     } finally {
       setLoading(false);
@@ -94,6 +107,7 @@ export const AuthForm = () => {
                     value={loginData.email}
                     onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                     required
+                    dir="ltr"
                   />
                 </div>
                 <div className="space-y-2">
@@ -104,6 +118,7 @@ export const AuthForm = () => {
                     value={loginData.password}
                     onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                     required
+                    dir="ltr"
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
@@ -132,6 +147,7 @@ export const AuthForm = () => {
                     value={registerData.email}
                     onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
                     required
+                    dir="ltr"
                   />
                 </div>
                 <div className="space-y-2">
@@ -142,6 +158,8 @@ export const AuthForm = () => {
                     value={registerData.password}
                     onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
                     required
+                    dir="ltr"
+                    minLength={6}
                   />
                 </div>
                 <div className="space-y-2">
@@ -152,6 +170,8 @@ export const AuthForm = () => {
                     value={registerData.confirmPassword}
                     onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
                     required
+                    dir="ltr"
+                    minLength={6}
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
