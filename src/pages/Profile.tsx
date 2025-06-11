@@ -1,140 +1,47 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { User, Mail, Phone, Globe, Calendar, MapPin, Edit, Save, X } from 'lucide-react';
-import Sidebar from '@/components/dashboard/Sidebar';
+import { Helmet } from "react-helmet-async";
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { useAuth } from '@/hooks/useAuth';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import Header from '@/components/dashboard/Header';
+import Sidebar from '@/components/dashboard/Sidebar';
+import { User, Mail, Phone, MapPin, Calendar, Edit3 } from 'lucide-react';
+import { useState } from 'react';
 
 const Profile = () => {
-  const [language, setLanguage] = useState('ar');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, profile, updateProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: "أحمد محمد علي السيد",
-    email: "ahmed.ali@example.com",
-    phone: "+201234567890",
-    nationality: "مصري",
-    country: "مصر",
-    birthDate: "1995-05-15",
-    gender: "ذكر",
-    preferredLanguage: "عربي",
-    role: "طالب"
+    full_name: profile?.full_name || '',
+    phone: profile?.phone || '',
+    address: profile?.address || '',
+    date_of_birth: profile?.date_of_birth || ''
   });
 
-  // Mock user data
-  const user = {
-    name: "أحمد محمد علي",
-    role: "طالب",
-    avatar: "/placeholder.svg",
-    rating: 4.5,
-    notifications: 3,
-    messages: 2
-  };
-
-  const content = {
-    ar: {
-      profile: "الملف الشخصي",
-      personalInfo: "المعلومات الشخصية",
-      edit: "تعديل",
-      save: "حفظ",
-      cancel: "إلغاء",
-      name: "الاسم الكامل",
-      email: "البريد الإلكتروني", 
-      phone: "رقم الهاتف",
-      nationality: "الجنسية",
-      country: "البلد",
-      birthDate: "تاريخ الميلاد",
-      gender: "الجنس",
-      preferredLanguage: "اللغة المفضلة",
-      role: "الدور",
-      male: "ذكر",
-      female: "أنثى",
-      requestChange: "طلب تغيير البيانات",
-      changeNote: "بعض البيانات تتطلب موافقة إدارية للتغيير",
-      accountSettings: "إعدادات الحساب",
-      changePassword: "تغيير كلمة المرور",
-      twoFactor: "المصادقة الثنائية",
-      privacy: "إعدادات الخصوصية"
-    },
-    en: {
-      profile: "Profile",
-      personalInfo: "Personal Information",
-      edit: "Edit",
-      save: "Save", 
-      cancel: "Cancel",
-      name: "Full Name",
-      email: "Email",
-      phone: "Phone Number",
-      nationality: "Nationality",
-      country: "Country",
-      birthDate: "Birth Date",
-      gender: "Gender",
-      preferredLanguage: "Preferred Language",
-      role: "Role",
-      male: "Male",
-      female: "Female",
-      requestChange: "Request Data Change",
-      changeNote: "Some data requires administrative approval to change",
-      accountSettings: "Account Settings",
-      changePassword: "Change Password",
-      twoFactor: "Two-Factor Authentication",
-      privacy: "Privacy Settings"
-    }
-  };
-
-  const currentContent = content[language as keyof typeof content];
-
-  const handleSave = () => {
-    // هنا سيتم حفظ البيانات
-    console.log('Saving profile data:', formData);
-    setIsEditing(false);
-  };
-
-  const handleCancel = () => {
-    // استعادة البيانات الأصلية
+  const handleSave = async () => {
+    await updateProfile(formData);
     setIsEditing(false);
   };
 
   return (
-    <div className={`min-h-screen bg-gray-50 ${language === 'ar' ? 'font-arabic' : ''}`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      <div className="flex h-screen">
-        {/* Sidebar */}
-        <Sidebar 
-          language={language} 
-          user={user}
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-        />
-
-        {/* Main content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Header */}
-          <Header 
-            language={language}
-            onLanguageToggle={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
-            onMenuClick={() => setSidebarOpen(true)}
-            user={user}
-          />
-
-          {/* Profile content */}
-          <main className="flex-1 overflow-y-auto p-6">
+    <ProtectedRoute>
+      <Helmet>
+        <title>الملف الشخصي - مركز إقامة الكتاب</title>
+      </Helmet>
+      
+      <div className="min-h-screen bg-gray-50 flex">
+        <Sidebar />
+        <div className="flex-1">
+          <Header />
+          <main className="p-6">
             <div className="max-w-4xl mx-auto">
-              {/* Page header */}
               <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  {currentContent.profile}
+                  الملف الشخصي
                 </h1>
                 <p className="text-gray-600">
                   إدارة معلوماتك الشخصية وإعدادات الحساب
@@ -142,184 +49,137 @@ const Profile = () => {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Profile card */}
-                <div className="lg:col-span-2">
-                  <Card>
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="flex items-center space-x-2 rtl:space-x-reverse">
-                          <User className="h-5 w-5" />
-                          <span>{currentContent.personalInfo}</span>
-                        </CardTitle>
-                        {!isEditing ? (
-                          <Button onClick={() => setIsEditing(true)} size="sm">
-                            <Edit className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                            {currentContent.edit}
-                          </Button>
+                {/* Profile Summary Card */}
+                <Card className="lg:col-span-1">
+                  <CardHeader className="text-center">
+                    <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <User className="h-12 w-12 text-white" />
+                    </div>
+                    <CardTitle>{profile?.full_name}</CardTitle>
+                    <CardDescription>
+                      {profile?.role === 'student' && 'طالب'}
+                      {profile?.role === 'teacher' && 'مدرب'}
+                      {profile?.role === 'admin' && 'مدير'}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm text-gray-600">
+                        <Mail className="h-4 w-4" />
+                        <span>{user?.email}</span>
+                      </div>
+                      {profile?.phone && (
+                        <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm text-gray-600">
+                          <Phone className="h-4 w-4" />
+                          <span>{profile.phone}</span>
+                        </div>
+                      )}
+                      {profile?.address && (
+                        <div className="flex items-center space-x-2 rtl:space-x-reverse text-sm text-gray-600">
+                          <MapPin className="h-4 w-4" />
+                          <span>{profile.address}</span>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Profile Details */}
+                <Card className="lg:col-span-2">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle>المعلومات الشخصية</CardTitle>
+                        <CardDescription>
+                          تحديث بياناتك الشخصية
+                        </CardDescription>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsEditing(!isEditing)}
+                      >
+                        <Edit3 className="h-4 w-4 mr-2" />
+                        {isEditing ? 'إلغاء' : 'تعديل'}
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="full_name">الاسم الكامل</Label>
+                          {isEditing ? (
+                            <Input
+                              id="full_name"
+                              value={formData.full_name}
+                              onChange={(e) => setFormData({...formData, full_name: e.target.value})}
+                            />
+                          ) : (
+                            <p className="py-2 px-3 bg-gray-50 rounded-md">{profile?.full_name}</p>
+                          )}
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="phone">رقم الهاتف</Label>
+                          {isEditing ? (
+                            <Input
+                              id="phone"
+                              value={formData.phone}
+                              onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                            />
+                          ) : (
+                            <p className="py-2 px-3 bg-gray-50 rounded-md">{profile?.phone || 'غير محدد'}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="address">العنوان</Label>
+                        {isEditing ? (
+                          <Textarea
+                            id="address"
+                            value={formData.address}
+                            onChange={(e) => setFormData({...formData, address: e.target.value})}
+                          />
                         ) : (
-                          <div className="flex space-x-2 rtl:space-x-reverse">
-                            <Button onClick={handleSave} size="sm">
-                              <Save className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                              {currentContent.save}
-                            </Button>
-                            <Button onClick={handleCancel} variant="outline" size="sm">
-                              <X className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                              {currentContent.cancel}
-                            </Button>
-                          </div>
+                          <p className="py-2 px-3 bg-gray-50 rounded-md">{profile?.address || 'غير محدد'}</p>
                         )}
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <Label htmlFor="name">{currentContent.name}</Label>
-                          <Input
-                            id="name"
-                            value={formData.name}
-                            onChange={(e) => setFormData({...formData, name: e.target.value})}
-                            disabled={!isEditing}
-                            className="mt-1"
-                          />
-                        </div>
 
-                        <div>
-                          <Label htmlFor="email">{currentContent.email}</Label>
+                      <div className="space-y-2">
+                        <Label htmlFor="date_of_birth">تاريخ الميلاد</Label>
+                        {isEditing ? (
                           <Input
-                            id="email"
-                            type="email"
-                            value={formData.email}
-                            onChange={(e) => setFormData({...formData, email: e.target.value})}
-                            disabled={!isEditing}
-                            className="mt-1"
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="phone">{currentContent.phone}</Label>
-                          <Input
-                            id="phone"
-                            value={formData.phone}
-                            onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                            disabled={!isEditing}
-                            className="mt-1"
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="nationality">{currentContent.nationality}</Label>
-                          <Input
-                            id="nationality"
-                            value={formData.nationality}
-                            disabled={true}
-                            className="mt-1 bg-gray-50"
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="country">{currentContent.country}</Label>
-                          <Input
-                            id="country"
-                            value={formData.country}
-                            disabled={true}
-                            className="mt-1 bg-gray-50"
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="birthDate">{currentContent.birthDate}</Label>
-                          <Input
-                            id="birthDate"
+                            id="date_of_birth"
                             type="date"
-                            value={formData.birthDate}
-                            disabled={true}
-                            className="mt-1 bg-gray-50"
+                            value={formData.date_of_birth}
+                            onChange={(e) => setFormData({...formData, date_of_birth: e.target.value})}
                           />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="gender">{currentContent.gender}</Label>
-                          <Input
-                            id="gender"
-                            value={formData.gender}
-                            disabled={true}
-                            className="mt-1 bg-gray-50"
-                          />
-                        </div>
-
-                        <div>
-                          <Label htmlFor="role">{currentContent.role}</Label>
-                          <div className="mt-1">
-                            <Badge variant="secondary" className="text-sm">
-                              {formData.role}
-                            </Badge>
-                          </div>
-                        </div>
+                        ) : (
+                          <p className="py-2 px-3 bg-gray-50 rounded-md">{profile?.date_of_birth || 'غير محدد'}</p>
+                        )}
                       </div>
 
-                      {!isEditing && (
-                        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                          <p className="text-sm text-blue-800">
-                            <strong>ملاحظة:</strong> {currentContent.changeNote}
-                          </p>
-                          <Button className="mt-2" variant="outline" size="sm">
-                            {currentContent.requestChange}
+                      {isEditing && (
+                        <div className="flex justify-end space-x-2 rtl:space-x-reverse">
+                          <Button variant="outline" onClick={() => setIsEditing(false)}>
+                            إلغاء
+                          </Button>
+                          <Button onClick={handleSave}>
+                            حفظ التغييرات
                           </Button>
                         </div>
                       )}
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Account settings sidebar */}
-                <div className="space-y-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>{currentContent.accountSettings}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <Button variant="outline" className="w-full justify-start">
-                        <User className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                        {currentContent.changePassword}
-                      </Button>
-                      <Button variant="outline" className="w-full justify-start">
-                        <Mail className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                        {currentContent.twoFactor}
-                      </Button>
-                      <Button variant="outline" className="w-full justify-start">
-                        <Globe className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
-                        {currentContent.privacy}
-                      </Button>
-                    </CardContent>
-                  </Card>
-
-                  {/* Profile stats */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>إحصائيات الملف</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">تاريخ التسجيل</span>
-                        <span className="text-sm font-medium">يناير 2024</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">آخر تسجيل دخول</span>
-                        <span className="text-sm font-medium">اليوم</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">حالة الحساب</span>
-                        <Badge variant="secondary">نشط</Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </main>
         </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 };
 
