@@ -10,7 +10,7 @@ import { BookOpen, GraduationCap, Clock, Trophy } from 'lucide-react';
 
 const Dashboard = () => {
   const { user, profile, loading } = useAuth();
-  const { enrollments, loading: enrollmentsLoading } = useEnrollments(user?.id);
+  const { enrollments, isLoading: enrollmentsLoading } = useEnrollments(user?.id);
 
   if (loading) {
     return (
