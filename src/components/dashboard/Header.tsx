@@ -2,9 +2,12 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bell, MessageSquare, Globe, Menu, User } from 'lucide-react';
+import { Bell, MessageSquare, Globe, User } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 const Header = () => {
+  const { profile } = useAuth();
+
   return (
     <header className="bg-white shadow-sm border-b px-6 py-4">
       <div className="flex items-center justify-between">
@@ -55,7 +58,7 @@ const Header = () => {
               <User className="h-4 w-4 text-white" />
             </div>
             <span className="text-sm font-medium text-gray-700 hidden md:block">
-              المستخدم
+              {profile?.full_name || 'المستخدم'}
             </span>
           </div>
         </div>

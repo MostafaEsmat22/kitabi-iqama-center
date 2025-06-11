@@ -9,8 +9,16 @@ import Sidebar from '@/components/dashboard/Sidebar';
 import { BookOpen, GraduationCap, Clock, Trophy } from 'lucide-react';
 
 const Dashboard = () => {
-  const { user, profile } = useAuth();
-  const { enrollments } = useEnrollments(user?.id);
+  const { user, profile, loading } = useAuth();
+  const { enrollments, loading: enrollmentsLoading } = useEnrollments(user?.id);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   const stats = {
     totalCourses: enrollments?.length || 0,
@@ -33,7 +41,7 @@ const Dashboard = () => {
             <div className="max-w-6xl mx-auto">
               <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  مرحباً، {profile?.full_name}
+                  مرحباً، {profile?.full_name || 'مستخدم'}
                 </h1>
                 <p className="text-gray-600">
                   نظرة عامة على نشاطك التعليمي
@@ -97,11 +105,15 @@ const Dashboard = () => {
                     <CardDescription>آخر الدورات المسجل بها</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {enrollments && enrollments.length > 0 ? (
+                    {enrollmentsLoading ? (
+                      <div className="flex items-center justify-center p-4">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                      </div>
+                    ) : enrollments && enrollments.length > 0 ? (
                       <div className="space-y-4">
                         {enrollments.slice(0, 3).map((enrollment) => (
                           <div key={enrollment.id} className="border-b pb-3 last:border-b-0">
-                            <h4 className="font-medium">{enrollment.course?.title}</h4>
+                            <h4 className="font-medium">{enrollment.course?.title || 'دورة غير محددة'}</h4>
                             <p className="text-sm text-gray-600">
                               {enrollment.status === 'approved' && 'مقبول'}
                               {enrollment.status === 'pending' && 'في انتظار الموافقة'}
