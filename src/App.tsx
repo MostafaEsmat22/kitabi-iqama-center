@@ -10,8 +10,10 @@ import Register from "./pages/Register";
 import TermsPrivacy from "./pages/TermsPrivacy";
 import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/Dashboard";
+import Summary from "./pages/Summary";
 import Profile from "./pages/Profile";
 import MyCourses from "./pages/MyCourses";
+import CourseDetails from "./pages/CourseDetails";
 import ApplyCourse from "./pages/ApplyCourse";
 import Performance from "./pages/Performance";
 import Wallet from "./pages/Wallet";
@@ -36,8 +38,10 @@ const App = () => (
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/terms-privacy" element={<TermsPrivacy />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/summary" element={<Summary />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/courses" element={<MyCourses />} />
+          <Route path="/course/:courseId" element={<CourseDetails />} />
           <Route path="/apply-course" element={<ApplyCourse />} />
           <Route path="/performance" element={<Performance />} />
           <Route path="/wallet" element={<Wallet />} />
@@ -45,7 +49,6 @@ const App = () => (
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/completed-courses" element={<CompletedCourses />} />
           <Route path="/support" element={<Support />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -5,13 +5,16 @@ import { useEnrollments } from '@/hooks/useEnrollments';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import Header from '@/components/dashboard/Header';
 import Sidebar from '@/components/dashboard/Sidebar';
-import { Calendar, Clock, User } from 'lucide-react';
+import { Calendar, Clock, User, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const MyCourses = () => {
   const { user } = useAuth();
   const { enrollments, isLoading } = useEnrollments(user?.id);
+  const navigate = useNavigate();
 
   const getStatusBadge = (status: string) => {
     const statusMap = {
@@ -22,6 +25,10 @@ const MyCourses = () => {
     };
     
     return statusMap[status as keyof typeof statusMap] || statusMap.pending;
+  };
+
+  const handleCourseClick = (courseId: string) => {
+    navigate(`/course/${courseId}`);
   };
 
   return (
@@ -63,7 +70,7 @@ const MyCourses = () => {
                     const statusInfo = getStatusBadge(enrollment.status || 'pending');
                     
                     return (
-                      <Card key={enrollment.id} className="h-full">
+                      <Card key={enrollment.id} className="h-full hover:shadow-md transition-shadow cursor-pointer">
                         <CardHeader>
                           <div className="flex justify-between items-start">
                             <CardTitle className="text-lg">{course?.title}</CardTitle>
@@ -112,6 +119,16 @@ const MyCourses = () => {
                           <div className="text-xs text-gray-500">
                             تاريخ التسجيل: {new Date(enrollment.enrollment_date || '').toLocaleDateString('ar-SA')}
                           </div>
+
+                          {enrollment.status === 'approved' && (
+                            <Button 
+                              className="w-full"
+                              onClick={() => handleCourseClick(course?.id || '')}
+                            >
+                              <span>عرض تفاصيل الدورة</span>
+                              <ArrowLeft className="h-4 w-4 mr-2" />
+                            </Button>
+                          )}
                         </CardContent>
                       </Card>
                     );
