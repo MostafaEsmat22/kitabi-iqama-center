@@ -10,7 +10,10 @@ import { BookOpen, GraduationCap, Clock, Trophy } from 'lucide-react';
 
 const Dashboard = () => {
   const { user, profile, loading } = useAuth();
-  const { enrollments, isLoading: enrollmentsLoading } = useEnrollments(user?.id);
+  const { enrollments, isLoading: enrollmentsLoading, error: enrollmentsError } = useEnrollments(user?.id);
+
+  console.log('Dashboard render - User:', user?.id, 'Profile:', profile?.full_name, 'Loading:', loading);
+  console.log('Enrollments:', enrollments, 'Loading:', enrollmentsLoading, 'Error:', enrollmentsError);
 
   if (loading) {
     return (
@@ -18,6 +21,11 @@ const Dashboard = () => {
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
       </div>
     );
+  }
+
+  if (!user) {
+    console.log('No user found, should redirect to auth');
+    return null;
   }
 
   const stats = {
@@ -109,6 +117,11 @@ const Dashboard = () => {
                       <div className="flex items-center justify-center p-4">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                       </div>
+                    ) : enrollmentsError ? (
+                      <div className="text-center p-4">
+                        <p className="text-red-500">حدث خطأ في تحميل البيانات</p>
+                        <p className="text-sm text-gray-500 mt-2">يرجى إعادة تحميل الصفحة</p>
+                      </div>
                     ) : enrollments && enrollments.length > 0 ? (
                       <div className="space-y-4">
                         {enrollments.slice(0, 3).map((enrollment) => (
@@ -124,7 +137,7 @@ const Dashboard = () => {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-gray-500">لا توجد دورات مسجل بها</p>
+                      <p className="text-gray-500 text-center p-4">لا توجد دورات مسجل بها</p>
                     )}
                   </CardContent>
                 </Card>

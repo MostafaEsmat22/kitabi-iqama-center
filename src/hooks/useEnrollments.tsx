@@ -13,10 +13,17 @@ type Enrollment = Database['public']['Tables']['enrollments']['Row'] & {
 export const useEnrollments = (studentId?: string) => {
   const queryClient = useQueryClient();
 
-  const { data: enrollments, isLoading } = useQuery({
+  const { data: enrollments, isLoading, error } = useQuery({
     queryKey: ['enrollments', studentId],
     queryFn: async () => {
-      let query = supabase
+      if (!studentId) {
+        console.log('No student ID provided to useEnrollments');
+        return [];
+      }
+
+      console.log('Fetching enrollments for student:', studentId);
+      
+      const { data, error } = await supabase
         .from('enrollments')
         .select(`
           *,
@@ -24,15 +31,16 @@ export const useEnrollments = (studentId?: string) => {
             *,
             instructor:profiles!courses_instructor_id_fkey(full_name)
           )
-        `);
+        `)
+        .eq('student_id', studentId)
+        .order('enrollment_date', { ascending: false });
 
-      if (studentId) {
-        query = query.eq('student_id', studentId);
+      if (error) {
+        console.error('Error fetching enrollments:', error);
+        throw error;
       }
-
-      const { data, error } = await query.order('enrollment_date', { ascending: false });
-
-      if (error) throw error;
+      
+      console.log('Enrollments fetched successfully:', data);
       return data as Enrollment[];
     },
     enabled: !!studentId,
@@ -63,9 +71,14 @@ export const useEnrollments = (studentId?: string) => {
     },
   });
 
+  if (error) {
+    console.error('useEnrollments error:', error);
+  }
+
   return {
-    enrollments,
+    enrollments: enrollments || [],
     isLoading,
+    error,
     enrollInCourse: enrollInCourseMutation.mutate,
     isEnrolling: enrollInCourseMutation.isPending,
   };
