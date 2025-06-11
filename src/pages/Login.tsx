@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BookOpen, Globe, Eye, EyeOff } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
   const [language, setLanguage] = useState('ar');
@@ -53,7 +53,7 @@ const Login = () => {
     e.preventDefault();
     // Here you would handle the login logic
     console.log('Login attempt:', formData);
-    // For now, just navigate to dashboard (placeholder)
+    // For now, just navigate to dashboard
     navigate('/dashboard');
   };
 
@@ -131,12 +131,12 @@ const Login = () => {
               </div>
 
               <div className="text-right rtl:text-left">
-                <a
-                  href="/forgot-password"
+                <Link
+                  to="/forgot-password"
                   className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
                 >
                   {currentContent.forgotPassword}
-                </a>
+                </Link>
               </div>
 
               <Button
@@ -150,12 +150,12 @@ const Login = () => {
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 {currentContent.noAccount}{' '}
-                <a
-                  href="/register"
+                <Link
+                  to="/register"
                   className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
                 >
                   {currentContent.createAccount}
-                </a>
+                </Link>
               </p>
             </div>
 
