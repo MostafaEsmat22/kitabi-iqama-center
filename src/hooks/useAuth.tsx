@@ -84,6 +84,10 @@ export const useAuth = () => {
     return { error };
   };
 
+  const logout = async () => {
+    return await signOut();
+  };
+
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!user) return { error: new Error('No user logged in') };
 
@@ -108,6 +112,7 @@ export const useAuth = () => {
     signIn,
     signUp,
     signOut,
+    logout,
     updateProfile,
     isAdmin: profile?.role === 'admin',
     isTeacher: profile?.role === 'teacher',
