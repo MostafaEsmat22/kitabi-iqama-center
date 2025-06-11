@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -209,8 +208,12 @@ const Index = () => {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center space-x-3 rtl:space-x-reverse">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center">
-                <BookOpen className="h-6 w-6 text-white" />
+              <div className="w-12 h-12 flex items-center justify-center">
+                <img 
+                  src="/lovable-uploads/3655de23-c3ef-447f-b395-45902c3e9256.png" 
+                  alt="مركز إقامة الكتاب" 
+                  className="w-12 h-12 object-contain"
+                />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-800">{currentContent.title}</h1>
@@ -510,8 +513,12 @@ const Index = () => {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 rtl:space-x-reverse mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg flex items-center justify-center">
-                  <BookOpen className="h-5 w-5 text-white" />
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <img 
+                    src="/lovable-uploads/3655de23-c3ef-447f-b395-45902c3e9256.png" 
+                    alt="مركز إقامة الكتاب" 
+                    className="w-10 h-10 object-contain"
+                  />
                 </div>
                 <h4 className="text-lg font-bold">{currentContent.title}</h4>
               </div>
