@@ -4,7 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
 
-type Course = Database['public']['Tables']['courses']['Row'];
+type Course = Database['public']['Tables']['courses']['Row'] & {
+  instructor: { full_name: string } | null;
+};
 type CourseInsert = Database['public']['Tables']['courses']['Insert'];
 
 export const useCourses = () => {
@@ -23,7 +25,7 @@ export const useCourses = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as Course[];
     },
   });
 

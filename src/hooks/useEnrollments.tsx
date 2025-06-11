@@ -4,7 +4,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
 
-type Enrollment = Database['public']['Tables']['enrollments']['Row'];
+type Enrollment = Database['public']['Tables']['enrollments']['Row'] & {
+  course: Database['public']['Tables']['courses']['Row'] & {
+    instructor: { full_name: string } | null;
+  } | null;
+};
 
 export const useEnrollments = (studentId?: string) => {
   const queryClient = useQueryClient();
@@ -17,11 +21,7 @@ export const useEnrollments = (studentId?: string) => {
         .select(`
           *,
           course:courses(
-            id,
-            title,
-            description,
-            start_date,
-            end_date,
+            *,
             instructor:profiles!courses_instructor_id_fkey(full_name)
           )
         `);
@@ -33,7 +33,7 @@ export const useEnrollments = (studentId?: string) => {
       const { data, error } = await query.order('enrollment_date', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as Enrollment[];
     },
     enabled: !!studentId,
   });
