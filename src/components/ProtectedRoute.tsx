@@ -1,6 +1,6 @@
 
 import { useAuth } from '@/hooks/useAuth';
-import { AuthForm } from '@/components/auth/AuthForm';
+import AuthForm from '@/components/auth/AuthForm';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
