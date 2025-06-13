@@ -52,6 +52,13 @@ export interface CourseDetailsData {
   } | null;
 }
 
+interface CourseDetailsResponse {
+  course: any;
+  enrollment: any;
+  stats: any;
+  error?: string;
+}
+
 export const useCourseDetails = (courseId: string) => {
   const { profile } = useAuth();
 
@@ -76,15 +83,18 @@ export const useCourseDetails = (courseId: string) => {
         throw courseError;
       }
 
-      if (courseData?.error) {
-        throw new Error(courseData.error);
+      // Type assertion for the response
+      const typedCourseData = courseData as CourseDetailsResponse;
+
+      if (typedCourseData?.error) {
+        throw new Error(typedCourseData.error);
       }
 
       // جلب معلومات المدرب
       const { data: instructorData, error: instructorError } = await supabase
         .from('profiles')
         .select('full_name, phone')
-        .eq('id', courseData.course.instructor_id)
+        .eq('id', typedCourseData.course.instructor_id)
         .single();
 
       if (instructorError) {
@@ -93,7 +103,7 @@ export const useCourseDetails = (courseId: string) => {
 
       // جلب تقدم الطالب إذا كان مسجلاً
       let progressData = null;
-      if (courseData.enrollment && profile.role === 'student') {
+      if (typedCourseData.enrollment && profile.role === 'student') {
         const { data: progress, error: progressError } = await supabase
           .rpc('get_student_course_progress', {
             course_uuid: courseId,
@@ -108,9 +118,9 @@ export const useCourseDetails = (courseId: string) => {
       }
 
       const result: CourseDetailsData = {
-        course: courseData.course,
-        enrollment: courseData.enrollment,
-        stats: courseData.stats,
+        course: typedCourseData.course,
+        enrollment: typedCourseData.enrollment,
+        stats: typedCourseData.stats,
         instructor: instructorData,
         progress: progressData
       };
