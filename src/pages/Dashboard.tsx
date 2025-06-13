@@ -19,16 +19,21 @@ const Dashboard = () => {
   console.log('Dashboard render - User:', user?.id, 'Profile:', profile?.full_name, 'Loading:', loading);
   console.log('Enrollments:', enrollments, 'Loading:', enrollmentsLoading, 'Error:', enrollmentsError);
 
+  // Show loading spinner while authentication is loading
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">جاري التحميل...</p>
+        </div>
       </div>
     );
   }
 
+  // Redirect to login if no user (this will be handled by ProtectedRoute)
   if (!user) {
-    console.log('No user found, should redirect to auth');
+    console.log('No user found, ProtectedRoute should handle redirect');
     return null;
   }
 
@@ -64,7 +69,7 @@ const Dashboard = () => {
               {/* Stats Cards */}
               <StatsCards stats={stats} userRole={profile?.role} />
 
-              {/* Charts Section */}
+              {/* Charts Section - Only show if we have data */}
               {enrollments && enrollments.length > 0 && (
                 <ProgressChart enrollments={enrollments} userRole={profile?.role} />
               )}
@@ -86,11 +91,18 @@ const Dashboard = () => {
                       {enrollmentsLoading ? (
                         <div className="flex items-center justify-center p-8">
                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                          <span className="mr-3 text-gray-600">جاري تحميل الدورات...</span>
                         </div>
                       ) : enrollmentsError ? (
                         <div className="text-center p-8">
-                          <p className="text-red-500">حدث خطأ في تحميل البيانات</p>
-                          <p className="text-sm text-gray-500 mt-2">يرجى إعادة تحميل الصفحة</p>
+                          <p className="text-red-500 mb-2">حدث خطأ في تحميل البيانات</p>
+                          <p className="text-sm text-gray-500">يرجى إعادة تحميل الصفحة</p>
+                          <button 
+                            onClick={() => window.location.reload()} 
+                            className="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                          >
+                            إعادة التحميل
+                          </button>
                         </div>
                       ) : enrollments && enrollments.length > 0 ? (
                         <div className="space-y-4">
@@ -125,7 +137,13 @@ const Dashboard = () => {
                         </div>
                       ) : (
                         <div className="text-center p-8">
-                          <p className="text-gray-500">لا توجد دورات مسجل بها</p>
+                          <p className="text-gray-500 mb-3">لا توجد دورات مسجل بها حالياً</p>
+                          <button 
+                            onClick={() => window.location.href = '/apply-course'} 
+                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                          >
+                            تسجيل في دورة جديدة
+                          </button>
                         </div>
                       )}
                     </CardContent>
