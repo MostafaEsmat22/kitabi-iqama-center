@@ -21,6 +21,8 @@ const CourseMaterials = ({ materials, userRole }: CourseMaterialsProps) => {
       case 'mp4':
       case 'mov':
       case 'avi':
+      case 'mp3':
+      case 'wav':
         return <Video className="h-4 w-4 text-blue-600" />;
       case 'jpg':
       case 'jpeg':
@@ -40,11 +42,14 @@ const CourseMaterials = ({ materials, userRole }: CourseMaterialsProps) => {
         return 'PDF';
       case 'doc':
       case 'docx':
-        return 'Word';
+        return 'مستند';
       case 'mp4':
       case 'mov':
       case 'avi':
         return 'فيديو';
+      case 'mp3':
+      case 'wav':
+        return 'صوت';
       case 'jpg':
       case 'jpeg':
       case 'png':
@@ -66,7 +71,13 @@ const CourseMaterials = ({ materials, userRole }: CourseMaterialsProps) => {
         </CardHeader>
         <CardContent>
           <div className="text-center p-8">
+            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-3" />
             <p className="text-gray-500">لا توجد مواد تعليمية متاحة حالياً</p>
+            {userRole === 'teacher' && (
+              <p className="text-sm text-gray-400 mt-2">
+                يمكنك إضافة المواد التعليمية عند إنشاء الجلسات
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -105,6 +116,8 @@ const CourseMaterials = ({ materials, userRole }: CourseMaterialsProps) => {
                   onClick={() => {
                     // In a real app, this would trigger the actual download
                     console.log('Downloading:', material);
+                    // For now, show a message
+                    alert(`سيتم تحميل: ${material}`);
                   }}
                 >
                   <Download className="h-4 w-4" />

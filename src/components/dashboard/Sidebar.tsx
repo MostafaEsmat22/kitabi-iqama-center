@@ -1,178 +1,180 @@
 
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
-  LayoutDashboard, 
-  BookOpen, 
-  User, 
-  Wallet, 
-  MessageCircle, 
-  Bell, 
-  Award, 
-  HelpCircle, 
-  LogOut,
-  FileText,
-  GraduationCap,
-  BarChart3
-} from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import LogoutConfirmation from './LogoutConfirmation';
+import {
+  Home,
+  BookOpen,
+  Calendar,
+  MessageSquare,
+  Bell,
+  User,
+  Settings,
+  LogOut,
+  ChevronLeft,
+  ChevronRight,
+  HelpCircle,
+  BarChart3,
+  CreditCard,
+  Award,
+  FileText,
+  Video,
+  Users,
+  PlusCircle,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 const Sidebar = () => {
-  const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
-  const { profile, signOut } = useAuth();
-  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const { profile } = useAuth();
 
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      navigate('/');
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
-  };
+  const isTeacher = profile?.role === 'teacher';
+  const isAdmin = profile?.role === 'admin';
 
-  const menuItems = [
-    {
-      title: "الملخص",
-      icon: LayoutDashboard,
-      path: "/summary",
-      roles: ["admin", "teacher", "student"]
-    },
-    {
-      title: "دوراتي الحالية", 
-      icon: BookOpen,
-      path: "/courses",
-      roles: ["admin", "teacher", "student"]
-    },
-    {
-      title: "التسجيل في الدورات",
-      icon: GraduationCap,
-      path: "/apply-course",
-      roles: ["student"]
-    },
-    {
-      title: "الأداء",
-      icon: BarChart3,
-      path: "/performance", 
-      roles: ["admin", "teacher", "student"]
-    },
-    {
-      title: "الدورات المكتملة",
-      icon: Award,
-      path: "/completed-courses",
-      roles: ["admin", "teacher", "student"] 
-    },
-    {
-      title: "المحفظة",
-      icon: Wallet,
-      path: "/wallet",
-      roles: ["admin", "teacher", "student"]
-    },
-    {
-      title: "الرسائل", 
-      icon: MessageCircle,
-      path: "/messages",
-      roles: ["admin", "teacher", "student"]
-    },
-    {
-      title: "الإشعارات",
-      icon: Bell,
-      path: "/notifications", 
-      roles: ["admin", "teacher", "student"]
-    },
-    {
-      title: "الملف الشخصي",
-      icon: User,
-      path: "/profile",
-      roles: ["admin", "teacher", "student"]
-    },
-    {
-      title: "تواصل معنا",
-      icon: HelpCircle, 
-      path: "/support",
-      roles: ["admin", "teacher", "student"]
-    }
+  const studentNavItems = [
+    { icon: Home, label: 'الرئيسية', href: '/dashboard' },
+    { icon: BookOpen, label: 'دوراتي', href: '/courses' },
+    { icon: PlusCircle, label: 'التسجيل في دورة', href: '/apply-course' },
+    { icon: BarChart3, label: 'الأداء', href: '/performance' },
+    { icon: Award, label: 'الدورات المكتملة', href: '/completed' },
+    { icon: MessageSquare, label: 'الرسائل', href: '/messages' },
+    { icon: Bell, label: 'الإشعارات', href: '/notifications' },
+    { icon: CreditCard, label: 'المحفظة', href: '/wallet' },
+    { icon: User, label: 'الملف الشخصي', href: '/profile' },
+    { icon: HelpCircle, label: 'الدعم', href: '/support' },
   ];
 
-  const filteredMenuItems = menuItems.filter(item => 
-    !profile?.role || item.roles.includes(profile.role)
-  );
+  const teacherNavItems = [
+    { icon: Home, label: 'لوحة المدرب', href: '/teacher-dashboard' },
+    { icon: BookOpen, label: 'دوراتي', href: '/courses' },
+    { icon: Video, label: 'الجلسات', href: '/sessions' },
+    { icon: FileText, label: 'الواجبات', href: '/assignments' },
+    { icon: Users, label: 'الطلاب', href: '/students' },
+    { icon: BarChart3, label: 'التقارير', href: '/performance' },
+    { icon: MessageSquare, label: 'الرسائل', href: '/messages' },
+    { icon: Bell, label: 'الإشعارات', href: '/notifications' },
+    { icon: User, label: 'الملف الشخصي', href: '/profile' },
+    { icon: HelpCircle, label: 'الدعم', href: '/support' },
+  ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const adminNavItems = [
+    { icon: Home, label: 'لوحة الإدارة', href: '/admin-dashboard' },
+    { icon: Users, label: 'إدارة المستخدمين', href: '/admin/users' },
+    { icon: BookOpen, label: 'إدارة الدورات', href: '/admin/courses' },
+    { icon: BarChart3, label: 'التقارير', href: '/admin/reports' },
+    { icon: Settings, label: 'الإعدادات', href: '/admin/settings' },
+    { icon: MessageSquare, label: 'الرسائل', href: '/messages' },
+    { icon: Bell, label: 'الإشعارات', href: '/notifications' },
+    { icon: User, label: 'الملف الشخصي', href: '/profile' },
+    { icon: HelpCircle, label: 'الدعم', href: '/support' },
+  ];
+
+  const getNavItems = () => {
+    if (isAdmin) return adminNavItems;
+    if (isTeacher) return teacherNavItems;
+    return studentNavItems;
+  };
+
+  const navItems = getNavItems();
 
   return (
-    <>
-      <div className="w-64 bg-white shadow-sm border-r border-gray-200 h-full flex flex-col">
-        {/* Profile Section */}
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center space-x-3 rtl:space-x-reverse">
-            <Avatar className="h-12 w-12">
-              <AvatarImage src={profile?.avatar_url || ''} />
-              <AvatarFallback className="bg-blue-600 text-white">
-                {profile?.full_name?.split(' ').map(n => n[0]).join('') || 'ط'}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-medium text-gray-900 truncate">
-                {profile?.full_name || 'مستخدم'}
-              </h3>
-              <p className="text-xs text-gray-500">
-                {profile?.role === 'student' && 'طالب'}
-                {profile?.role === 'teacher' && 'معلم'}
-                {profile?.role === 'admin' && 'مدير'}
-              </p>
+    <div className={cn(
+      'bg-white border-l border-gray-200 transition-all duration-300 flex flex-col',
+      collapsed ? 'w-16' : 'w-64'
+    )}>
+      {/* Header */}
+      <div className="p-4 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          {!collapsed && (
+            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-white" />
+              </div>
+              <span className="font-bold text-gray-900">مركز إقامة الكتاب</span>
             </div>
-          </div>
-        </div>
-
-        {/* Navigation Menu */}
-        <ScrollArea className="flex-1 px-3 py-4">
-          <nav className="space-y-2">
-            {filteredMenuItems.map((item) => (
-              <Button
-                key={item.path}
-                variant={isActive(item.path) ? "default" : "ghost"}
-                className={`w-full justify-start text-right h-10 ${
-                  isActive(item.path) 
-                    ? "bg-blue-600 text-white hover:bg-blue-700" 
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-                onClick={() => navigate(item.path)}
-              >
-                <item.icon className="ml-3 h-4 w-4" />
-                {item.title}
-              </Button>
-            ))}
-          </nav>
-        </ScrollArea>
-
-        <Separator />
-        
-        {/* Logout Button */}
-        <div className="p-3">
+          )}
           <Button
             variant="ghost"
-            className="w-full justify-start text-right h-10 text-red-600 hover:bg-red-50 hover:text-red-700"
-            onClick={() => setShowLogoutDialog(true)}
+            size="sm"
+            onClick={() => setCollapsed(!collapsed)}
+            className="h-8 w-8 p-0"
           >
-            <LogOut className="ml-3 h-4 w-4" />
-            تسجيل الخروج
+            {collapsed ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" />
+            )}
           </Button>
         </div>
       </div>
 
-      <LogoutConfirmation
-        open={showLogoutDialog}
-        onOpenChange={setShowLogoutDialog}
-        onConfirm={handleLogout}
-      />
-    </>
+      {/* Role Badge */}
+      {!collapsed && profile?.role && (
+        <div className="px-4 py-2">
+          <Badge 
+            variant={
+              profile.role === 'admin' ? 'destructive' : 
+              profile.role === 'teacher' ? 'default' : 
+              'secondary'
+            }
+            className="w-full justify-center"
+          >
+            {profile.role === 'admin' && 'مدير'}
+            {profile.role === 'teacher' && 'مدرب'}
+            {profile.role === 'student' && 'طالب'}
+          </Badge>
+        </div>
+      )}
+
+      {/* Navigation */}
+      <nav className="flex-1 p-4">
+        <ul className="space-y-2">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.href;
+            return (
+              <li key={item.href}>
+                <Link
+                  to={item.href}
+                  className={cn(
+                    'flex items-center space-x-3 rtl:space-x-reverse px-3 py-2 rounded-lg transition-colors',
+                    isActive
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  )}
+                >
+                  <item.icon className="h-5 w-5 flex-shrink-0" />
+                  {!collapsed && <span>{item.label}</span>}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      {/* User Info */}
+      {!collapsed && (
+        <div className="p-4 border-t border-gray-200">
+          <div className="flex items-center space-x-3 rtl:space-x-reverse mb-3">
+            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+              <User className="h-4 w-4 text-gray-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {profile?.full_name || 'مستخدم'}
+              </p>
+              <p className="text-xs text-gray-500 truncate">
+                {profile?.role === 'admin' && 'مدير النظام'}
+                {profile?.role === 'teacher' && 'مدرب'}
+                {profile?.role === 'student' && 'طالب'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
