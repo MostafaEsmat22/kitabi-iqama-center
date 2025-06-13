@@ -71,6 +71,7 @@ function App() {
               <Route path="/terms" element={<TermsPrivacy />} />
               <Route path="/admin-register" element={<AdminRegister />} />
               <Route path="/teacher-register" element={<TeacherRegister />} />
+              <Route path="/test" element={<TestPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Toaster />

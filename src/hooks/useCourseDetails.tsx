@@ -52,13 +52,6 @@ export interface CourseDetailsData {
   } | null;
 }
 
-interface CourseDetailsResponse {
-  course: any;
-  enrollment: any;
-  stats: any;
-  error?: string;
-}
-
 export const useCourseDetails = (courseId: string) => {
   const { profile } = useAuth();
 
@@ -83,8 +76,13 @@ export const useCourseDetails = (courseId: string) => {
         throw courseError;
       }
 
-      // Type assertion for the response
-      const typedCourseData = courseData as CourseDetailsResponse;
+      // تحويل البيانات إلى النوع المناسب مع التحقق من الأمان
+      const typedCourseData = courseData as unknown as {
+        course: any;
+        enrollment: any;
+        stats: any;
+        error?: string;
+      };
 
       if (typedCourseData?.error) {
         throw new Error(typedCourseData.error);
