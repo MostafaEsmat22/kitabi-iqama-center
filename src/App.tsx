@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import TeacherRegister from "./pages/TeacherRegister";
+import AdminRegister from "./pages/AdminRegister";
 import TermsPrivacy from "./pages/TermsPrivacy";
 import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/Dashboard";
@@ -37,6 +38,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/teacher-register" element={<TeacherRegister />} />
+            <Route path="/admin-register" element={<AdminRegister />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/terms-privacy" element={<TermsPrivacy />} />
             <Route path="/dashboard" element={<Dashboard />} />
