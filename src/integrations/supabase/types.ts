@@ -555,6 +555,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_course_details_with_stats: {
+        Args: { course_uuid: string; user_uuid: string }
+        Returns: Json
+      }
+      get_student_course_progress: {
+        Args: { course_uuid: string; student_uuid: string }
+        Returns: Json
+      }
       get_student_stats: {
         Args: { student_uuid: string }
         Returns: Json
