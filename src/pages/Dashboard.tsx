@@ -9,12 +9,17 @@ import StatsCards from '@/components/dashboard/StatsCards';
 import ProgressChart from '@/components/dashboard/ProgressChart';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import UpcomingAssignments from '@/components/dashboard/UpcomingAssignments';
+import UpcomingSessions from '@/components/dashboard/UpcomingSessions';
 import QuickActions from '@/components/dashboard/QuickActions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { BookOpen, Video, FileText, Calendar } from 'lucide-react';
 
 const Dashboard = () => {
   const { user, profile, loading } = useAuth();
   const { enrollments, isLoading: enrollmentsLoading, error: enrollmentsError } = useEnrollments(user?.id);
+  const navigate = useNavigate();
 
   console.log('Dashboard render - User:', user?.id, 'Profile:', profile?.full_name, 'Loading:', loading);
   console.log('Enrollments:', enrollments, 'Loading:', enrollmentsLoading, 'Error:', enrollmentsError);
@@ -79,6 +84,41 @@ const Dashboard = () => {
                 <QuickActions userRole={profile?.role} />
               </div>
 
+              {/* Content Overview Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/courses')}>
+                  <CardContent className="p-6 text-center">
+                    <BookOpen className="h-8 w-8 text-blue-600 mx-auto mb-3" />
+                    <h3 className="font-semibold text-gray-900 mb-1">الدورات</h3>
+                    <p className="text-sm text-gray-600">عرض جميع دوراتك</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/courses')}>
+                  <CardContent className="p-6 text-center">
+                    <Video className="h-8 w-8 text-green-600 mx-auto mb-3" />
+                    <h3 className="font-semibold text-gray-900 mb-1">الجلسات</h3>
+                    <p className="text-sm text-gray-600">جلسات مباشرة ومسجلة</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/courses')}>
+                  <CardContent className="p-6 text-center">
+                    <FileText className="h-8 w-8 text-orange-600 mx-auto mb-3" />
+                    <h3 className="font-semibold text-gray-900 mb-1">الواجبات</h3>
+                    <p className="text-sm text-gray-600">تسليم وتقييم الواجبات</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/performance')}>
+                  <CardContent className="p-6 text-center">
+                    <Calendar className="h-8 w-8 text-purple-600 mx-auto mb-3" />
+                    <h3 className="font-semibold text-gray-900 mb-1">الأداء</h3>
+                    <p className="text-sm text-gray-600">تقارير وإحصائيات</p>
+                  </CardContent>
+                </Card>
+              </div>
+
               {/* Main Content Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Recent Courses - Spans 2 columns */}
@@ -115,7 +155,7 @@ const Dashboard = () => {
                                     المدرب: {enrollment.course?.instructor?.full_name || 'غير محدد'}
                                   </p>
                                 </div>
-                                <div className="text-right">
+                                <div className="text-right flex flex-col items-end space-y-2">
                                   <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
                                     enrollment.status === 'approved' ? 'bg-green-100 text-green-800' :
                                     enrollment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
@@ -127,6 +167,13 @@ const Dashboard = () => {
                                     {enrollment.status === 'completed' && 'مكتمل'}
                                     {enrollment.status === 'rejected' && 'مرفوض'}
                                   </span>
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    onClick={() => navigate(`/course/${enrollment.course_id}`)}
+                                  >
+                                    عرض التفاصيل
+                                  </Button>
                                   <p className="text-xs text-gray-500 mt-1">
                                     {new Date(enrollment.enrollment_date).toLocaleDateString('ar-SA')}
                                   </p>
@@ -139,7 +186,7 @@ const Dashboard = () => {
                         <div className="text-center p-8">
                           <p className="text-gray-500 mb-3">لا توجد دورات مسجل بها حالياً</p>
                           <button 
-                            onClick={() => window.location.href = '/apply-course'} 
+                            onClick={() => navigate('/apply-course')} 
                             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                           >
                             تسجيل في دورة جديدة
@@ -152,6 +199,10 @@ const Dashboard = () => {
 
                 {/* Sidebar Content */}
                 <div className="space-y-6">
+                  {/* Upcoming Sessions */}
+                  <UpcomingSessions />
+                  
+                  {/* Recent Activity */}
                   <RecentActivity enrollments={enrollments || []} />
                   
                   {profile?.role === 'student' && (

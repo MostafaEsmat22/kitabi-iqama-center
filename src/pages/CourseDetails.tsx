@@ -4,32 +4,31 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/dashboard/Header';
 import Sidebar from '@/components/dashboard/Sidebar';
+import SessionsList from '@/components/dashboard/SessionsList';
+import AssignmentsList from '@/components/dashboard/AssignmentsList';
+import CourseMaterials from '@/components/dashboard/CourseMaterials';
 import { 
   BookOpen, 
   Calendar, 
   User, 
   MessageSquare, 
-  FileText, 
   DollarSign, 
   Video,
-  Download,
-  Upload,
+  AlertTriangle,
   Clock,
-  CheckCircle,
-  AlertTriangle
+  CheckCircle
 } from 'lucide-react';
 import { useParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 
 const CourseDetails = () => {
   const { courseId } = useParams();
-  const [paymentProof, setPaymentProof] = useState<File | null>(null);
+  const { profile } = useAuth();
 
-  // Mock course data
+  // Mock course data - في التطبيق الحقيقي، ستجلب هذه البيانات من قاعدة البيانات
   const course = {
     id: courseId,
     title: 'دورة أساسيات التجويد',
@@ -42,62 +41,14 @@ const CourseDetails = () => {
     paymentAmount: 150,
     paymentDueDate: '2024-06-15',
     meetingLink: 'https://meet.example.com/room/123',
-    isPaymentOverdue: false
-  };
-
-  // Mock sessions data
-  const sessions = [
-    {
-      id: '1',
-      title: 'مقدمة في علم التجويد',
-      date: '2024-06-01',
-      completed: true,
-      summary: 'تم شرح أساسيات علم التجويد وأهميته',
-      materials: ['ملف المحاضرة.pdf', 'تسجيل الجلسة.mp4']
-    },
-    {
-      id: '2',
-      title: 'أحكام النون الساكنة والتنوين',
-      date: '2024-06-03',
-      completed: true,
-      summary: 'شرح تفصيلي لأحكام النون الساكنة والتنوين',
-      materials: ['شرح الأحكام.pdf']
-    },
-    {
-      id: '3',
-      title: 'أحكام الميم الساكنة',
-      date: '2024-06-08',
-      completed: false,
-      summary: '',
-      materials: []
-    }
-  ];
-
-  // Mock assignments
-  const assignments = [
-    {
-      id: '1',
-      title: 'واجب أسبوعي - الأحكام الأساسية',
-      dueDate: '2024-06-15',
-      status: 'pending',
-      grade: null,
-      feedback: null
-    },
-    {
-      id: '2',
-      title: 'اختبار شهري',
-      dueDate: '2024-06-20',
-      status: 'completed',
-      grade: 92,
-      feedback: 'أداء ممتاز، مع ملاحظة بسيطة على النطق'
-    }
-  ];
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setPaymentProof(file);
-    }
+    isPaymentOverdue: false,
+    description: 'دورة شاملة في أساسيات علم التجويد وتطبيقاته العملية',
+    materials: [
+      'كتاب أساسيات التجويد.pdf',
+      'ملخص الأحكام.docx',
+      'تسجيلات الأمثلة.mp3',
+      'خريطة الأحكام.jpg'
+    ]
   };
 
   return (
@@ -117,11 +68,12 @@ const CourseDetails = () => {
                   {course.title}
                 </h1>
                 <p className="text-gray-600">
-                  تفاصيل الدورة والتقدم الحالي
+                  {course.description}
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Course Overview */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                 {/* Course Info */}
                 <Card className="lg:col-span-2">
                   <CardHeader>
@@ -212,32 +164,9 @@ const CourseDetails = () => {
                       </div>
 
                       {course.paymentStatus !== 'completed' && (
-                        <div className="space-y-3">
-                          <Button className="w-full">
-                            دفع المصروفات
-                          </Button>
-                          
-                          <div className="border-t pt-3">
-                            <label className="block text-sm font-medium mb-2">
-                              إرفاق إثبات الدفع
-                            </label>
-                            <Input
-                              type="file"
-                              accept="image/*,.pdf"
-                              onChange={handleFileUpload}
-                              className="mb-2"
-                            />
-                            {paymentProof && (
-                              <p className="text-xs text-green-600">
-                                تم اختيار: {paymentProof.name}
-                              </p>
-                            )}
-                            <Button variant="outline" size="sm" className="w-full">
-                              <Upload className="h-4 w-4 mr-2" />
-                              إرسال الإثبات
-                            </Button>
-                          </div>
-                        </div>
+                        <Button className="w-full">
+                          دفع المصروفات
+                        </Button>
                       )}
 
                       <div className="bg-red-50 p-3 rounded-lg">
@@ -254,109 +183,72 @@ const CourseDetails = () => {
                 </Card>
               </div>
 
-              {/* Sessions */}
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle>ملخصات الجلسات</CardTitle>
-                  <CardDescription>
-                    عرض الجلسات السابقة والمواد التعليمية
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {sessions.map((session) => (
-                      <div key={session.id} className="border rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium">{session.title}</h4>
-                          <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                            {session.completed ? (
-                              <CheckCircle className="h-4 w-4 text-green-600" />
-                            ) : (
-                              <Clock className="h-4 w-4 text-yellow-600" />
-                            )}
-                            <span className="text-sm text-gray-600">{session.date}</span>
+              {/* Course Content Tabs */}
+              <Tabs defaultValue="sessions" className="w-full">
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="sessions">الجلسات</TabsTrigger>
+                  <TabsTrigger value="assignments">الواجبات</TabsTrigger>
+                  <TabsTrigger value="materials">المواد</TabsTrigger>
+                  <TabsTrigger value="progress">التقدم</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="sessions" className="mt-6">
+                  <SessionsList courseId={courseId!} userRole={profile?.role} />
+                </TabsContent>
+                
+                <TabsContent value="assignments" className="mt-6">
+                  <AssignmentsList courseId={courseId!} userRole={profile?.role} />
+                </TabsContent>
+                
+                <TabsContent value="materials" className="mt-6">
+                  <CourseMaterials materials={course.materials} userRole={profile?.role} />
+                </TabsContent>
+                
+                <TabsContent value="progress" className="mt-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>تقرير التقدم</CardTitle>
+                      <CardDescription>تفاصيل أدائك في الدورة</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="text-center p-4 bg-blue-50 rounded-lg">
+                            <div className="text-2xl font-bold text-blue-600">{course.sessionsCompleted}</div>
+                            <p className="text-sm text-gray-600">جلسات مكتملة</p>
+                          </div>
+                          <div className="text-center p-4 bg-green-50 rounded-lg">
+                            <div className="text-2xl font-bold text-green-600">85%</div>
+                            <p className="text-sm text-gray-600">معدل الحضور</p>
+                          </div>
+                          <div className="text-center p-4 bg-orange-50 rounded-lg">
+                            <div className="text-2xl font-bold text-orange-600">92</div>
+                            <p className="text-sm text-gray-600">متوسط الدرجات</p>
                           </div>
                         </div>
                         
-                        {session.summary && (
-                          <p className="text-sm text-gray-700 mb-3">{session.summary}</p>
-                        )}
-                        
-                        {session.materials.length > 0 && (
+                        <div className="space-y-4">
+                          <h4 className="font-medium">إنجازات الدورة</h4>
                           <div className="space-y-2">
-                            <p className="text-sm font-medium">المواد التعليمية:</p>
-                            {session.materials.map((material, index) => (
-                              <div key={index} className="flex items-center space-x-2 rtl:space-x-reverse">
-                                <FileText className="h-4 w-4 text-blue-600" />
-                                <span className="text-sm">{material}</span>
-                                <Button variant="ghost" size="sm">
-                                  <Download className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Assignments */}
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle>التكاليف والتقييمات</CardTitle>
-                  <CardDescription>
-                    الواجبات والاختبارات المطلوبة
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {assignments.map((assignment) => (
-                      <div key={assignment.id} className="border rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium">{assignment.title}</h4>
-                          <Badge 
-                            variant={assignment.status === 'completed' ? 'default' : 'secondary'}
-                          >
-                            {assignment.status === 'completed' ? 'مكتمل' : 'مطلوب'}
-                          </Badge>
-                        </div>
-                        
-                        <p className="text-sm text-gray-600 mb-3">
-                          موعد التسليم: {assignment.dueDate}
-                        </p>
-                        
-                        {assignment.grade && (
-                          <div className="bg-green-50 p-3 rounded-lg mb-3">
-                            <p className="text-sm font-medium text-green-800">
-                              الدرجة: {assignment.grade}%
-                            </p>
-                            {assignment.feedback && (
-                              <p className="text-sm text-green-700 mt-1">
-                                التعليق: {assignment.feedback}
-                              </p>
-                            )}
-                          </div>
-                        )}
-                        
-                        {assignment.status === 'pending' && (
-                          <div className="space-y-3">
-                            <Textarea placeholder="اكتب إجابتك هنا..." />
-                            <div className="flex space-x-2 rtl:space-x-reverse">
-                              <Button size="sm">تسليم الواجب</Button>
-                              <Button variant="outline" size="sm">
-                                <Upload className="h-4 w-4 mr-2" />
-                                إرفاق ملف
-                              </Button>
+                            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                              <CheckCircle className="h-4 w-4 text-green-600" />
+                              <span className="text-sm">أكمل 8 جلسات من أصل 12</span>
+                            </div>
+                            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                              <CheckCircle className="h-4 w-4 text-green-600" />
+                              <span className="text-sm">سلم 5 واجبات من أصل 6</span>
+                            </div>
+                            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                              <Clock className="h-4 w-4 text-yellow-600" />
+                              <span className="text-sm">يحتاج لتسليم واجب واحد</span>
                             </div>
                           </div>
-                        )}
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
             </div>
           </main>
         </div>
