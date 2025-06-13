@@ -23,34 +23,30 @@ export const useEnrollments = (studentId?: string) => {
 
       console.log('Fetching enrollments for student:', studentId);
       
-      try {
-        const { data, error } = await supabase
-          .from('enrollments')
-          .select(`
+      const { data, error } = await supabase
+        .from('enrollments')
+        .select(`
+          *,
+          course:courses(
             *,
-            course:courses(
-              *,
-              instructor:profiles!courses_instructor_id_fkey(full_name)
-            )
-          `)
-          .eq('student_id', studentId)
-          .order('enrollment_date', { ascending: false });
+            instructor:profiles!courses_instructor_id_fkey(full_name)
+          )
+        `)
+        .eq('student_id', studentId)
+        .order('enrollment_date', { ascending: false });
 
-        if (error) {
-          console.error('Supabase error fetching enrollments:', error);
-          throw error;
-        }
-        
-        console.log('Enrollments fetched successfully:', data);
-        return data as Enrollment[];
-      } catch (err) {
-        console.error('Error in useEnrollments queryFn:', err);
-        throw err;
+      if (error) {
+        console.error('Supabase error fetching enrollments:', error);
+        throw error;
       }
+      
+      console.log('Enrollments fetched successfully:', data);
+      return data as Enrollment[];
     },
     enabled: !!studentId,
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    retry: 2,
+    retryDelay: 1000,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const enrollInCourseMutation = useMutation({
@@ -78,9 +74,7 @@ export const useEnrollments = (studentId?: string) => {
     },
   });
 
-  if (error) {
-    console.error('useEnrollments hook error:', error);
-  }
+  console.log('useEnrollments - enrollments:', enrollments, 'isLoading:', isLoading, 'error:', error);
 
   return {
     enrollments: enrollments || [],

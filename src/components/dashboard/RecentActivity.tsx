@@ -1,48 +1,99 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, BookOpen, Award, Bell } from 'lucide-react';
+import { Clock, BookOpen, Award, Bell, CheckCircle, AlertTriangle } from 'lucide-react';
 
 interface RecentActivityProps {
   enrollments: any[];
 }
 
 const RecentActivity = ({ enrollments }: RecentActivityProps) => {
-  // Mock recent activities
-  const activities = [
-    {
-      id: 1,
-      type: 'enrollment',
-      title: 'تم قبولك في دورة القرآن الكريم',
-      time: 'منذ ساعتين',
-      icon: BookOpen,
-      color: 'bg-green-100 text-green-600',
-    },
-    {
-      id: 2,
-      type: 'assignment',
-      title: 'واجب جديد في دورة التفسير',
-      time: 'منذ 4 ساعات',
-      icon: Bell,
-      color: 'bg-blue-100 text-blue-600',
-    },
-    {
-      id: 3,
-      type: 'completion',
-      title: 'تم إكمال دورة الحديث الشريف',
-      time: 'أمس',
-      icon: Award,
-      color: 'bg-purple-100 text-purple-600',
-    },
-    {
-      id: 4,
-      type: 'reminder',
-      title: 'تذكير: جلسة مباشرة في دورة الفقه',
-      time: 'منذ يومين',
-      icon: Clock,
-      color: 'bg-orange-100 text-orange-600',
-    },
-  ];
+  // Generate activities from real enrollments data
+  const generateActivities = () => {
+    const activities = [];
+    
+    if (enrollments && enrollments.length > 0) {
+      // Add enrollment activities
+      enrollments.slice(0, 3).forEach((enrollment, index) => {
+        const course = enrollment.course;
+        const enrollmentDate = new Date(enrollment.enrollment_date);
+        const timeAgo = getTimeAgo(enrollmentDate);
+        
+        if (enrollment.status === 'approved') {
+          activities.push({
+            id: `enrollment-${enrollment.id}`,
+            type: 'enrollment',
+            title: `تم قبولك في دورة ${course?.title || 'غير محددة'}`,
+            time: timeAgo,
+            icon: CheckCircle,
+            color: 'bg-green-100 text-green-600',
+          });
+        } else if (enrollment.status === 'pending') {
+          activities.push({
+            id: `pending-${enrollment.id}`,
+            type: 'pending',
+            title: `في انتظار الموافقة على دورة ${course?.title || 'غير محددة'}`,
+            time: timeAgo,
+            icon: Clock,
+            color: 'bg-yellow-100 text-yellow-600',
+          });
+        } else if (enrollment.status === 'completed') {
+          activities.push({
+            id: `completed-${enrollment.id}`,
+            type: 'completion',
+            title: `تم إكمال دورة ${course?.title || 'غير محددة'}`,
+            time: timeAgo,
+            icon: Award,
+            color: 'bg-purple-100 text-purple-600',
+          });
+        }
+      });
+    }
+    
+    // Add some default activities if no enrollments
+    if (activities.length === 0) {
+      activities.push(
+        {
+          id: 'welcome',
+          type: 'info',
+          title: 'مرحباً بك في مركز إقامة الكتاب',
+          time: 'اليوم',
+          icon: BookOpen,
+          color: 'bg-blue-100 text-blue-600',
+        },
+        {
+          id: 'getting-started',
+          type: 'reminder',
+          title: 'ابدأ رحلتك التعليمية بالتسجيل في دورة',
+          time: 'الآن',
+          icon: Bell,
+          color: 'bg-orange-100 text-orange-600',
+        }
+      );
+    }
+    
+    return activities.slice(0, 4); // Limit to 4 activities
+  };
+
+  const getTimeAgo = (date: Date) => {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    
+    if (diffDays > 0) {
+      return diffDays === 1 ? 'أمس' : `منذ ${diffDays} أيام`;
+    } else if (diffHours > 0) {
+      return diffHours === 1 ? 'منذ ساعة' : `منذ ${diffHours} ساعات`;
+    } else if (diffMinutes > 0) {
+      return diffMinutes === 1 ? 'منذ دقيقة' : `منذ ${diffMinutes} دقائق`;
+    } else {
+      return 'الآن';
+    }
+  };
+
+  const activities = generateActivities();
 
   return (
     <Card>
@@ -68,11 +119,13 @@ const RecentActivity = ({ enrollments }: RecentActivityProps) => {
             </div>
           ))}
         </div>
-        <div className="mt-4 pt-4 border-t">
-          <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
-            عرض جميع الأنشطة
-          </button>
-        </div>
+        {enrollments && enrollments.length > 0 && (
+          <div className="mt-4 pt-4 border-t">
+            <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+              عرض جميع الأنشطة
+            </button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
