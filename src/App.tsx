@@ -23,6 +23,7 @@ import CourseDetails from "./pages/CourseDetails";
 import TermsPrivacy from "./pages/TermsPrivacy";
 import AdminRegister from "./pages/AdminRegister";
 import TeacherRegister from "./pages/TeacherRegister";
+import TestPage from "./pages/TestPage";
 import NotFound from "./pages/NotFound";
 import "./App.css";
 

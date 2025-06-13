@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCourses } from '@/hooks/useCourses';
 import { useAuth } from '@/hooks/useAuth';
-import { FileText, PlusIcon } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -56,17 +56,28 @@ const CreateAssignmentForm = ({ courseId, onSuccess }: CreateAssignmentFormProps
     }
 
     try {
+      console.log('Submitting assignment data:', data);
+      
       const assignmentData = {
-        ...data,
+        course_id: data.course_id,
+        title: data.title,
+        description: data.description || null,
         due_date: new Date(data.due_date).toISOString(),
+        max_score: data.max_score,
+        instructions: data.instructions,
         attachments: data.attachments ? data.attachments.split('\n').filter(a => a.trim()) : [],
       };
+
+      console.log('Processed assignment data:', assignmentData);
 
       const { error } = await supabase
         .from('assignments')
         .insert(assignmentData);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
 
       toast.success('تم إنشاء الواجب بنجاح');
       form.reset();

@@ -8,10 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCourses } from '@/hooks/useCourses';
 import { useAuth } from '@/hooks/useAuth';
-import { CalendarIcon, PlusIcon } from 'lucide-react';
+import { PlusIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
 const courseSchema = z.object({
@@ -57,12 +56,23 @@ const CreateCourseForm = ({ onSuccess }: CreateCourseFormProps) => {
       return;
     }
 
+    console.log('Submitting course data:', data);
+
     const courseData = {
-      ...data,
+      title: data.title,
+      description: data.description,
+      start_date: data.start_date,
+      end_date: data.end_date,
+      duration_weeks: data.duration_weeks,
+      max_students: data.max_students,
+      price: data.price,
       instructor_id: user.id,
       requirements: data.requirements ? data.requirements.split('\n').filter(req => req.trim()) : [],
       status: 'active' as const,
+      syllabus: data.syllabus || null,
     };
+
+    console.log('Processed course data:', courseData);
 
     createCourse(courseData);
     
@@ -156,7 +166,7 @@ const CreateCourseForm = ({ onSuccess }: CreateCourseFormProps) => {
                         type="number" 
                         min="1"
                         {...field} 
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        onChange={(e) => field.onChange(parseInt(e.target.value) || 8)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -175,7 +185,7 @@ const CreateCourseForm = ({ onSuccess }: CreateCourseFormProps) => {
                         type="number" 
                         min="1"
                         {...field} 
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        onChange={(e) => field.onChange(parseInt(e.target.value) || 30)}
                       />
                     </FormControl>
                     <FormMessage />

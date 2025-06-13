@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCourses } from '@/hooks/useCourses';
 import { useAuth } from '@/hooks/useAuth';
-import { Video, PlusIcon } from 'lucide-react';
+import { Video } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -56,18 +56,28 @@ const CreateSessionForm = ({ courseId, onSuccess }: CreateSessionFormProps) => {
     }
 
     try {
+      console.log('Submitting session data:', data);
+      
       const sessionData = {
-        ...data,
+        course_id: data.course_id,
+        title: data.title,
+        description: data.description || null,
         session_date: new Date(data.session_date).toISOString(),
-        materials: data.materials ? data.materials.split('\n').filter(m => m.trim()) : [],
+        duration_minutes: data.duration_minutes,
         meeting_link: data.meeting_link || null,
+        materials: data.materials ? data.materials.split('\n').filter(m => m.trim()) : [],
       };
+
+      console.log('Processed session data:', sessionData);
 
       const { error } = await supabase
         .from('sessions')
         .insert(sessionData);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
 
       toast.success('تم إنشاء الجلسة بنجاح');
       form.reset();
